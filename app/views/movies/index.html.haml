@@ -20,7 +20,7 @@
   Include: 
   - @all_ratings.each do |rating|
     = rating
-    = check_box_tag "ratings[#{rating}]"
+    = check_box_tag "ratings[#{rating}]",1 , if params[:ratings]; params[:ratings].include?(rating) ? true : false else true end
   = submit_tag 'Refresh'
 
 = link_to 'Add new movie', new_movie_path
