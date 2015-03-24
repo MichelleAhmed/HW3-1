@@ -1,31 +1,33 @@
 # This file is app/controllers/movies_controller.rb
 class MoviesController < ApplicationController
-
   def index
     @all_ratings = Movie.all_ratings
-    if params[:sort_param]
-      session[:sort_param] = params[:sort_param]
-      if params[:sort_param] == "title"
-          @title_header = 'hilite'
-      elsif params[:sort_param] == "release_date"
-          @release_date_header = 'hilite'
+    @sorted = params[:sort_param]
+    if @sorted
+      session[:sort_param] = @sorted
+      if (@sorted == "title")
+        @title_header = "hilite"
+      elsif (@sorted == "release_date")
+        @release_date_header = "hilite"
       end
+    elsif session[:sort_param] && @sorted
+      flash.keep
+      redirect_to params.merge(:sort_param => session[:sort_param])
     end
-   
-    if session[:ratings]
+    @rated = params[:ratings]
+    if @rated
+      @r_hash = @rated
+      @r_array = @rated.keys
+      session[:ratings] = @r_hash
+    elsif session[:ratings]
       flash.keep
       redirect_to params.merge(:ratings => session[:ratings])
-   elsif params[:ratings]
-      @ratings_hash = params[:ratings]
-      @ratings_array = params[:ratings].keys
-      session[:ratings] = @ratings_hash
     else
-      @ratings_hash = {}
-      @ratings_array = @all_ratings
+      @r_hash = {}
+      @r_array = @all_ratings
     end
-    @movies = Movie.find_all_by_rating(@ratings_array, :order => session[:sort_param])
-end
-
+      @movies = Movie.find_all_by_rating(@r_array, :order => session[:sort_param])
+  end
 
   def show
     id = params[:id] # retrieve movie ID from URI route
